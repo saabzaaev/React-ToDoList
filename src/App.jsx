@@ -23,37 +23,12 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { useDispatch, useSelector } from "react-redux";
+import { editUser, setEditCity, setEditEmail, setEditObj, setEditPhone, setEditTitle } from "./reducer/todoSlice";
 
 function App() {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      img:"./src/assets/user 1.webp",
-      title: "maga",
-      email:"ehson@gmail.com",
-      city:"Kulob",
-      phone:"000601953",
-      status:true
-    },
-    {
-      id: 2,
-      img:"./src/assets/user3.webp",
-      title: "Ehson",
-      email:"ehson@gmail.com",
-      city:"Khujand",
-      phone:"000601953",
-      status:false
-    },
-    {
-      id: 3,
-      img:"./src/assets/user2.webp",
-      title: "Ehson",
-      email:"ehson@gmail.com",
-      city:"Dushanbe",
-      phone:"000601953",
-      status:false
-    }
-  ]);
+  const dispatch = useDispatch()
+
   const style =
   {
     position: 'absolute',
@@ -87,7 +62,7 @@ function App() {
   const [email , setEmail] = useState("")
   const [city , setCity] = useState("")
   const [phone , setPhone] = useState("")
-  const [idx , setIdx] = useState(null)
+  // const [idx , setIdx] = useState(null)
   const [img , setImg] = useState("")
 
   const[search , setSearch] = useState("")
@@ -135,26 +110,13 @@ function App() {
       }))
   }
 
-  function editUser()
-  {
-    setData(data.filter(el=>
-      {
-        if(el.id == idx)
-        {
-          el.title = title
-          el.email = email
-          el.city = city
-          el.phone = phone
-          el.img = img
-        }
-        return el
-      }))
-    setOpens(false)
-    setTitle("")
-    setEmail("")
-    setCity("")
-    setPhone("")
-  }
+
+  const data = useSelector(state => state.todoSlice.data)
+
+  const editTitle = useSelector(state => state.todoSlice.editTitle)
+  const editEmail = useSelector(state => state.todoSlice.editEmail)
+  const editCity = useSelector(state => state.todoSlice.editCity)
+  const editPhone = useSelector(state => state.todoSlice.editPhone)
 
   return (
     <>
@@ -215,7 +177,6 @@ function App() {
 
     </header>
 
-
     <main>
       
     <TableContainer component={Paper} sx={{width:"90%" , margin:"auto"}}>
@@ -244,7 +205,7 @@ function App() {
               })
             .filter(el=>
               {
-                return el.title.toLocaleLowerCase().trim().includes(search)
+                return el.city.toLocaleLowerCase().trim().includes(search)
               })
             .map((el , i) =>
             (
@@ -255,7 +216,7 @@ function App() {
                 <TableCell align="right">{el.city}</TableCell>
                 <TableCell align="right"><Button variant="contained" sx={{backgroundColor:el.status?"green":"red"}} >{el.status ? 'Online': 'Offline'}</Button></TableCell>
                 <TableCell align="right">{el.phone}</TableCell>
-                <TableCell align="right"><Button variant="contained" onClick={()=> {handleOpens() , setTitle(el.title) , setCity(el.city) , setEmail(el.email) , setPhone(el.phone) , setIdx(el.id) , setImg(el.img)} }>EDIT</Button> <Button variant="contained" color="error" onClick={() => deleteUser(el.id)}>DELETE</Button> <Checkbox checked={el.status} onClick={()=> isCompleade(el.id)} {...label} /></TableCell>
+                <TableCell align="right"><Button variant="contained" onClick={()=> {handleOpens(), dispatch(setEditObj({idx:el.id ,title:el.title , email:el.email , city:el.city , phone:el.phone , img:el.img }))} }>EDIT</Button> <Button variant="contained" color="error" onClick={() => deleteUser(el.id)}>DELETE</Button> <Checkbox checked={el.status} onClick={()=> isCompleade(el.id)} {...label} /></TableCell>
               </TableRow>
             ))
           }
@@ -310,12 +271,12 @@ function App() {
       >
         <Fade in={opens}>
           <Box sx={style} className="flex flex-col gap-5 rounded-xl">
-              <TextField value={img} onChange={(el) => setImg(el.target.value)} size="small" sx={{width:"100%"}} label="Title"/>
-              <TextField value={title} onChange={(el) => setTitle(el.target.value)} size="small" sx={{width:"100%"}} label="Title"/>
-              <TextField value={email} onChange={(el) => setEmail(el.target.value)} size="small" sx={{width:"100%"}} label="Email"/>
-              <TextField value={city} onChange={(el) => setCity(el.target.value)} size="small" sx={{width:"100%"}} label="City"/>
-              <TextField value={phone} onChange={(el) => setPhone(el.target.value)} size="small" sx={{width:"100%"}} label="Phone"/>
-              <Button variant="contained" onClick={()=> editUser()}>Save</Button>
+              {/* <TextField value={img} onChange={(el) => setImg(el.target.value)} size="small" sx={{width:"100%"}} label="Title"/> */}
+              <TextField value={editTitle} onChange={(el) => dispatch(setEditTitle(el.target.value))} size="small" sx={{width:"100%"}} label="Title"/>
+              <TextField value={editEmail} onChange={(el) => dispatch(setEditEmail(el.target.value))} size="small" sx={{width:"100%"}} label="Email"/>
+              <TextField value={editCity} onChange={(el) => dispatch(setEditCity(el.target.value))} size="small" sx={{width:"100%"}} label="City"/>
+              <TextField value={editPhone} onChange={(el) => dispatch(setEditPhone(el.target.value))} size="small" sx={{width:"100%"}} label="Phone"/>
+              <Button variant="contained" onClick={()=> {dispatch(editUser()) , handleCloses()}}>Save</Button>
           </Box>
         </Fade>
     </Modal>
